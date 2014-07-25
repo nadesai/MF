@@ -4,8 +4,8 @@
     
 """
 
-import factorization
-import seeding
+from . import factorization
+from . import seeding
 
 
 def list_mf_methods():

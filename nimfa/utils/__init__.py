@@ -5,5 +5,5 @@
     
 """
 
-import linalg
-import utils
+from . import linalg
+from . import utils

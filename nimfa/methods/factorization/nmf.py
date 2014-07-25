@@ -82,7 +82,7 @@ class Nmf(nmf_std.Nmf_std):
          
         Return fitted factorization model.
         """
-        for run in xrange(self.n_run):
+        for run in range(self.n_run):
             self.W, self.H = self.seed.initialize(
                 self.V, self.rank, self.options)
             p_obj = c_obj = sys.float_info.max
@@ -188,18 +188,18 @@ class Nmf(nmf_std.Nmf_std):
     def euclidean_update(self):
         """Update basis and mixture matrix based on Euclidean distance multiplicative update rules."""
         self.H = multiply(
-            self.H, elop(dot(self.W.T, self.V), dot(self.W.T, dot(self.W, self.H)), div))
+            self.H, elop(dot(self.W.T, self.V), dot(self.W.T, dot(self.W, self.H)), floordiv))
         self.W = multiply(
-            self.W, elop(dot(self.V, self.H.T), dot(self.W, dot(self.H, self.H.T)), div))
+            self.W, elop(dot(self.V, self.H.T), dot(self.W, dot(self.H, self.H.T)), floordiv))
 
     def divergence_update(self):
         """Update basis and mixture matrix based on divergence multiplicative update rules."""
         H1 = repmat(self.W.sum(0).T, 1, self.V.shape[1])
         self.H = multiply(
-            self.H, elop(dot(self.W.T, elop(self.V, dot(self.W, self.H), div)), H1, div))
+            self.H, elop(dot(self.W.T, elop(self.V, dot(self.W, self.H), floordiv)), H1, floordiv))
         W1 = repmat(self.H.sum(1).T, self.V.shape[0], 1)
         self.W = multiply(
-            self.W, elop(dot(elop(self.V, dot(self.W, self.H), div), self.H.T), W1, div))
+            self.W, elop(dot(elop(self.V, dot(self.W, self.H), floordiv), self.H.T), W1, floordiv))
 
     def fro_objective(self):
         """Compute squared Frobenius norm of a target matrix and its NMF estimate."""
@@ -209,7 +209,7 @@ class Nmf(nmf_std.Nmf_std):
     def div_objective(self):
         """Compute divergence of target matrix from its NMF estimate."""
         Va = dot(self.W, self.H)
-        return (multiply(self.V, sop(elop(self.V, Va, div), op=np.log)) - self.V + Va).sum()
+        return (multiply(self.V, sop(elop(self.V, Va, floordiv), op=np.log)) - self.V + Va).sum()
 
     def conn_objective(self):
         """
